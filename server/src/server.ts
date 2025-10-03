@@ -8,10 +8,13 @@ import {
     ProposedFeatures,
     Range,
     TextDocuments,
+    HoverParams,
+    Hover,
     TextDocumentSyncKind,
     Position,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { mapDocs } from './syntax/map';
 
 function getPositionFromIndex(text: string, index: number): Position {
     const lines = text.slice(0, index).split(/\r?\n/);
@@ -39,7 +42,7 @@ function validateMapSyntax(text: string) {
             diagnostics.push({
                 severity: 1, // Error
                 range: { start: startPos, end: endPos },
-                message: `Invalid map syntax: "${value}". Expected "item of items" or "item, i of items".`,
+                message: `Invalid map syntax: "${value}".\n\nExpected "item of items" or "item, i of items".`,
                 source: 'html6-lsp',
             });
         }
@@ -53,6 +56,38 @@ function validateMapSyntax(text: string) {
     // <li map="x, i of data[0].list?.[3]"></li>     ✅
 
     return diagnostics;
+}
+
+/**
+ * Hover provider callback for map syntax.
+ * Returns Markdown examples when hovering over a map attribute.
+ */
+function hoverMapSyntax(params: HoverParams): Hover | null {
+    const doc = documents.get(params.textDocument.uri);
+    if (!doc) {
+        return null;
+    }
+
+    const offset = doc.offsetAt(params.position);
+    const text = doc.getText();
+
+    // Check if hover is over a map attribute
+    const mapRegex = /map="([^"]+)"/g;
+    let match: RegExpExecArray | null;
+    while ((match = mapRegex.exec(text)) !== null) {
+        const start = match.index;
+        const end = match.index + match[0].length;
+        if (offset >= start && offset <= end) {
+            return {
+                contents: {
+                    kind: 'markdown',
+                    value: mapDocs,
+                },
+            };
+        }
+    }
+
+    return null;
 }
 
 // サーバー接続オブジェクトを作成する。この接続にはNodeのIPC(プロセス間通信)を利用する
@@ -84,6 +119,7 @@ connection.onInitialize((_params, _cancel, progress) => {
                     includeText: false,
                 },
             },
+            hoverProvider: true,
         },
     } as InitializeResult;
 });
@@ -155,6 +191,8 @@ function setupDocumentsListeners() {
         // 警告を削除する
         void connection.sendDiagnostics({ uri: uri, diagnostics: [] });
     });
+
+    connection.onHover(hoverMapSyntax);
 }
 
 // Listen on the connection
