@@ -11,14 +11,14 @@ import { getPositionFromIndex } from '../utils/position';
  */
 function validateMapSyntax(text: string): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
-    const mapAttrRegex = /map="([^"]+)"/g;
+    const mapAttrRegex = /map="([^"]*)"/g;
 
     let match;
     while ((match = mapAttrRegex.exec(text)) !== null) {
         const value = match[1].trim();
 
-        // Validate syntax: "item of items" o "item, i of items"
-        const valid = /^(\w+)(,\s*\w+)?\s+of\s+[\w$.?\[\]]+$/.test(value);
+        // Validate syntax: "item of items" or "item, i of items"
+        const valid = value.length > 0 && /^(\w+)(,\s*\w+)?\s+of\s+[\w$.?\[\]]+$/.test(value);
         if (!valid) {
             // Create a diagnosis (error)
             const startPos = getPositionFromIndex(text, match.index); // function that converts an index into a Position
