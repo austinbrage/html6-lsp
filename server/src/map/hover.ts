@@ -82,4 +82,4 @@ function hoverMapSyntax(documents: TextDocuments<TextDocument>) {
     };
 }
 
-export { hoverMapSyntax };
+export { mapDocs, hoverMapSyntax };
