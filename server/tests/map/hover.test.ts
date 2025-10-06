@@ -1,4 +1,4 @@
-import { validateMapSyntax } from '../src/validators/map';
+import { validateMapSyntax } from '../../src/map/validator';
 import { describe, it, expect } from 'vitest';
 
 describe('validateMapSyntax', () => {

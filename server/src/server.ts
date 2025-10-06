@@ -11,8 +11,8 @@ import {
     TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { validateMapSyntax } from './validators/map';
-import { hoverMapSyntax } from './hover/map';
+import { validateMapSyntax } from './map/validator';
+import { hoverMapSyntax } from './map/hover';
 
 // サーバー接続オブジェクトを作成する。この接続にはNodeのIPC(プロセス間通信)を利用する
 // LSPの全機能を提供する

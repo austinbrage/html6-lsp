@@ -38,7 +38,7 @@ The \`map\` attribute is used to iterate over arrays in templates.
 <div map="group of groups">
   <h2>{{group.name}}</h2>
   <ul>
-    <li map="item of group.items">{{item}}</li>
+	<li map="item of group.items">{{item}}</li>
   </ul>
 </div>
 \`\`\`
