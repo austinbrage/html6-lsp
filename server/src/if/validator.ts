@@ -10,18 +10,26 @@ import { getPositionFromIndex } from '../utils/position';
  */
 function validateIfSyntax(text: string): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
-    const ifAttrRegex = /(if|elsif)="([^"]+)"/g;
+    const ifAttrRegex = /(if|elsif)="([^"]*)"/g;
 
     let match;
     while ((match = ifAttrRegex.exec(text)) !== null) {
         const attrName = match[1];
         const value = match[2].trim();
 
-        // Try parsing the expression using Function constructor
-        try {
-            // Wrap in a return to check as an expression
-            new Function(`return (${value});`);
-        } catch (e) {
+        // Empty value is invalid
+        let valid = value.length > 0;
+
+        // If non-empty, try parsing as JS expression
+        if (valid) {
+            try {
+                new Function(`return (${value});`);
+            } catch (e) {
+                valid = false;
+            }
+        }
+
+        if (!valid) {
             const startPos = getPositionFromIndex(text, match.index);
             const endPos = getPositionFromIndex(text, match.index + match[0].length);
 

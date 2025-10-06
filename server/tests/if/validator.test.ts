@@ -42,5 +42,12 @@ describe('If Validator', () => {
             expect(diagnostics).toHaveLength(1);
             expect(diagnostics[0].message).toMatch(/Invalid if expression/);
         });
+
+        it('should detect empty if attribute as invalid', () => {
+            const text = `<li if=""></li>`;
+            const diagnostics = validateIfSyntax(text);
+            expect(diagnostics).toHaveLength(1);
+            expect(diagnostics[0].message).toMatch(/Invalid if expression/);
+        });
     });
 });
