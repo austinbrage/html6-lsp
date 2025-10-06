@@ -63,7 +63,7 @@ function hoverMapSyntax(documents: TextDocuments<TextDocument>) {
         const text = doc.getText();
 
         // Check if hover is over a map attribute
-        const mapRegex = /map="([^"]+)"/g;
+        const mapRegex = /map="([^"]*)"/g;
         let match: RegExpExecArray | null;
         while ((match = mapRegex.exec(text)) !== null) {
             const start = match.index;
