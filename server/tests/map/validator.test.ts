@@ -32,6 +32,12 @@ describe('Map Validator', () => {
             const diagnostics = validateMapSyntax(text);
             expect(diagnostics).toHaveLength(0);
         });
+
+        it('should allow valid expression on map items', () => {
+            const text = `<li map="item of project.items"></li>`;
+            const diagnostics = validateMapSyntax(text);
+            expect(diagnostics).toHaveLength(0);
+        });
     });
 
     describe('Invalid map attributes', () => {
@@ -46,7 +52,7 @@ describe('Map Validator', () => {
             const text = `<li map="item, of items"></li>`;
             const diagnostics = validateMapSyntax(text);
             expect(diagnostics).toHaveLength(1);
-            expect(diagnostics[0].message).toContain('Invalid map syntax');
+            expect(diagnostics[0].message).toContain('Invalid map variable part');
         });
 
         it('should detect "item," as invalid', () => {
@@ -60,7 +66,14 @@ describe('Map Validator', () => {
             const text = `<li map=""></li>`;
             const diagnostics = validateMapSyntax(text);
             expect(diagnostics).toHaveLength(1);
-            expect(diagnostics[0].message).toContain('Invalid map syntax');
+            expect(diagnostics[0].message).toContain('Map attribute cannot be empty');
+        });
+
+        it('should detect invalid expression on map items', () => {
+            const text = `<li map="item of project/.items"></li>`;
+            const diagnostics = validateMapSyntax(text);
+            expect(diagnostics).toHaveLength(1);
+            expect(diagnostics[0].message).toContain('Invalid expression in map item');
         });
     });
 });
