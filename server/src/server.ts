@@ -12,6 +12,7 @@ import {
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { validateIfSyntax } from './if/validator';
+import { hoverIfSyntax } from './if/hover';
 import { validateMapSyntax } from './map/validator';
 import { hoverMapSyntax } from './map/hover';
 
@@ -120,7 +121,17 @@ function setupDocumentsListeners() {
         void connection.sendDiagnostics({ uri: uri, diagnostics: [] });
     });
 
-    connection.onHover(hoverMapSyntax(documents));
+    const hoverHandlers = [hoverIfSyntax(documents), hoverMapSyntax(documents)];
+
+    connection.onHover((params) => {
+        for (const handler of hoverHandlers) {
+            const result = handler(params);
+            if (result) {
+                return result;
+            }
+        }
+        return null;
+    });
 }
 
 // Listen on the connection
