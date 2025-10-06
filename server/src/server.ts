@@ -8,45 +8,11 @@ import {
     ProposedFeatures,
     Range,
     TextDocuments,
-    HoverParams,
-    Hover,
     TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { mapDocs } from './syntax/map';
 import { validateMapSyntax } from './validators/map';
-
-/**
- * Hover provider callback for map syntax.
- * Returns Markdown examples when hovering over a map attribute.
- */
-function hoverMapSyntax(params: HoverParams): Hover | null {
-    const doc = documents.get(params.textDocument.uri);
-    if (!doc) {
-        return null;
-    }
-
-    const offset = doc.offsetAt(params.position);
-    const text = doc.getText();
-
-    // Check if hover is over a map attribute
-    const mapRegex = /map="([^"]+)"/g;
-    let match: RegExpExecArray | null;
-    while ((match = mapRegex.exec(text)) !== null) {
-        const start = match.index;
-        const end = match.index + match[0].length;
-        if (offset >= start && offset <= end) {
-            return {
-                contents: {
-                    kind: 'markdown',
-                    value: mapDocs,
-                },
-            };
-        }
-    }
-
-    return null;
-}
+import { hoverMapSyntax } from './hover/map';
 
 // サーバー接続オブジェクトを作成する。この接続にはNodeのIPC(プロセス間通信)を利用する
 // LSPの全機能を提供する
@@ -150,7 +116,7 @@ function setupDocumentsListeners() {
         void connection.sendDiagnostics({ uri: uri, diagnostics: [] });
     });
 
-    connection.onHover(hoverMapSyntax);
+    connection.onHover(hoverMapSyntax(documents));
 }
 
 // Listen on the connection
