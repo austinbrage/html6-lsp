@@ -47,7 +47,7 @@ describe('If Validator', () => {
             const text = `<li if=""></li>`;
             const diagnostics = validateIfSyntax(text);
             expect(diagnostics).toHaveLength(1);
-            expect(diagnostics[0].message).toMatch(/Invalid if expression/);
+            expect(diagnostics[0].message).toMatch(/If attribute cannot be empty/);
         });
     });
 });

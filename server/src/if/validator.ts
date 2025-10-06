@@ -12,33 +12,40 @@ function validateIfSyntax(text: string): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
     const ifAttrRegex = /(if|elsif)="([^"]*)"/g;
 
+    const addDiagnostic = (start: number, end: number, message: string) => {
+        diagnostics.push({
+            severity: DiagnosticSeverity.Error,
+            range: {
+                start: getPositionFromIndex(text, start),
+                end: getPositionFromIndex(text, end),
+            },
+            message,
+            source: 'html6-lsp',
+        });
+    };
+
     let match;
     while ((match = ifAttrRegex.exec(text)) !== null) {
         const attrName = match[1];
         const value = match[2].trim();
 
-        // Empty value is invalid
-        let valid = value.length > 0;
+        const startIdx = match.index;
+        const endIdx = match.index + match[0].length;
 
-        // If non-empty, try parsing as JS expression
-        if (valid) {
-            try {
-                new Function(`return (${value});`);
-            } catch (e) {
-                valid = false;
-            }
+        if (value.length === 0) {
+            addDiagnostic(startIdx, endIdx, 'If attribute cannot be empty');
+            continue;
         }
 
-        if (!valid) {
-            const startPos = getPositionFromIndex(text, match.index);
-            const endPos = getPositionFromIndex(text, match.index + match[0].length);
-
-            diagnostics.push({
-                severity: DiagnosticSeverity.Error,
-                range: { start: startPos, end: endPos },
-                message: `Invalid ${attrName} expression: "${value}".\n\nMust be a valid JavaScript expression.`,
-                source: 'html6-lsp',
-            });
+        // If non-empty, try parsing as JS expression
+        try {
+            new Function(`return (${value});`);
+        } catch (e) {
+            addDiagnostic(
+                startIdx,
+                endIdx,
+                `Invalid ${attrName} expression: "${value}".\n\nMust be a valid JavaScript expression.`
+            );
         }
     }
 
