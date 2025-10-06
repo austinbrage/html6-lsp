@@ -1,7 +1,7 @@
 import { validateMapSyntax } from '../../src/map/validator';
 import { describe, it, expect } from 'vitest';
 
-describe('validateMapSyntax', () => {
+describe('Map Validator', () => {
     describe('Valid map attributes', () => {
         it('should allow "item of items"', () => {
             const text = `<li map="item of items"></li>`;
