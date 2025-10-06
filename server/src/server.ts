@@ -11,6 +11,7 @@ import {
     TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { validateElseSyntax } from './else/validator';
 import { validateIfSyntax } from './if/validator';
 import { hoverIfSyntax } from './if/hover';
 import { validateMapSyntax } from './map/validator';
@@ -83,11 +84,12 @@ function validate(doc: TextDocument) {
 
     const if_diagnostics = validateIfSyntax(text);
     const map_diagnostics = validateMapSyntax(text);
+    const else_diagnostics = validateElseSyntax(text);
 
     // Send the diagnostics to the client (VS Code)
     void connection.sendDiagnostics({
         uri: doc.uri,
-        diagnostics: [...if_diagnostics, ...map_diagnostics],
+        diagnostics: [...if_diagnostics, ...map_diagnostics, ...else_diagnostics],
     });
 }
 
