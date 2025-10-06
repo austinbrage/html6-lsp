@@ -11,52 +11,10 @@ import {
     HoverParams,
     Hover,
     TextDocumentSyncKind,
-    Position,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { mapDocs } from './syntax/map';
-
-function getPositionFromIndex(text: string, index: number): Position {
-    const lines = text.slice(0, index).split(/\r?\n/);
-    const line = lines.length - 1;
-    const character = lines[lines.length - 1].length;
-    return { line, character };
-}
-
-function validateMapSyntax(text: string) {
-    const diagnostics: Diagnostic[] = [];
-    const mapAttrRegex = /map="([^"]+)"/g;
-
-    let match;
-    while ((match = mapAttrRegex.exec(text)) !== null) {
-        const value = match[1].trim();
-
-        // Validate syntax: "item of items" o "item, i of items"
-        // const valid = /^(\w+)(,\s*\w+)?\s+of\s+\w+$/.test(value);
-        const valid = /^(\w+)(,\s*\w+)?\s+of\s+[\w$.?\[\]]+$/.test(value);
-        if (!valid) {
-            // Create a diagnosis (error)
-            const startPos = getPositionFromIndex(text, match.index); // function that converts an index into a Position
-            const endPos = getPositionFromIndex(text, match.index + match[0].length);
-
-            diagnostics.push({
-                severity: 1, // Error
-                range: { start: startPos, end: endPos },
-                message: `Invalid map syntax: "${value}".\n\nExpected "item of items" or "item, i of items".`,
-                source: 'html6-lsp',
-            });
-        }
-    }
-
-    // Examples of valid syntax on maps
-    // 	<li map="item of items"></li>                ✅
-    // <li map="item, i of items"></li>              ✅
-    // <li map="nav of layout?.navigation"></li>     ✅
-    // <li map="item of layout?.[0]?.items"></li>    ✅
-    // <li map="x, i of data[0].list?.[3]"></li>     ✅
-
-    return diagnostics;
-}
+import { validateMapSyntax } from './validators/map';
 
 /**
  * Hover provider callback for map syntax.
