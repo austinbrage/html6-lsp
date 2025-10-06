@@ -9,6 +9,6 @@
         "lib": ["es2020"],
         "sourceMap": true
     },
-    "include": ["src"],
+    "include": ["src", "types"],
     "exclude": ["node_modules"]
 }
