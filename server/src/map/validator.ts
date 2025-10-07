@@ -13,9 +13,14 @@ function validateMapSyntax(text: string): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
     const mapAttrRegex = /map="([^"]*)"/g;
 
-    const addDiagnostic = (start: number, end: number, message: string) => {
+    const addDiagnostic = (
+        start: number,
+        end: number,
+        message: string,
+        severity?: DiagnosticSeverity
+    ) => {
         diagnostics.push({
-            severity: DiagnosticSeverity.Error,
+            severity: severity ?? DiagnosticSeverity.Error,
             range: {
                 start: getPositionFromIndex(text, start),
                 end: getPositionFromIndex(text, end),
@@ -32,7 +37,12 @@ function validateMapSyntax(text: string): Diagnostic[] {
         const endIdx = match.index + match[0].length;
 
         if (value.length === 0) {
-            addDiagnostic(startIdx, endIdx, 'Map attribute cannot be empty');
+            addDiagnostic(
+                startIdx,
+                endIdx,
+                'Map attribute cannot be empty',
+                DiagnosticSeverity.Warning
+            );
             continue;
         }
 
