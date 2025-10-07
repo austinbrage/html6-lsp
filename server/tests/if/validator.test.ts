@@ -29,6 +29,12 @@ describe('If Validator', () => {
     });
 
     describe('invalid expressions', () => {
+        it('should not match attributes that only contain "if" as substring (e.g., aif)', () => {
+            const text = `<div aif="false"></div>`;
+            const diagnostics = validateIfSyntax(text);
+            expect(diagnostics).toHaveLength(0);
+        });
+
         it('should return error for missing closing parenthesis', () => {
             const text = `<div if="user.isAdmin("></div>`;
             const diagnostics = validateIfSyntax(text);

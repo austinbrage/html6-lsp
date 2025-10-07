@@ -10,7 +10,7 @@ import { getPositionFromIndex } from '../utils/position';
  */
 function validateIfSyntax(text: string): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
-    const ifAttrRegex = /(if|elsif)="([^"]*)"/g;
+    const ifAttrRegex = /(?<=\s)(if|elsif)="([^"]*)"/g;
 
     const addDiagnostic = (start: number, end: number, message: string) => {
         diagnostics.push({
