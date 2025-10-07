@@ -1,4 +1,4 @@
-import { Diagnostic, DiagnosticSeverity, Position } from 'vscode-languageserver';
+import { Position } from 'vscode-languageserver';
 
 /**
  * Converts a string index into a VS Code `Position` (line and character).
@@ -18,30 +18,4 @@ function getPositionFromIndex(text: string, index: number): Position {
     return { line, character };
 }
 
-function addDiagnostic({
-    start,
-    end,
-    text,
-    message,
-    diagnostics,
-    severity,
-}: {
-    start: number;
-    end: number;
-    text: string;
-    message: string;
-    diagnostics: Diagnostic[];
-    severity?: DiagnosticSeverity;
-}) {
-    diagnostics.push({
-        severity: severity ?? DiagnosticSeverity.Error,
-        range: {
-            start: getPositionFromIndex(text, start),
-            end: getPositionFromIndex(text, end),
-        },
-        message,
-        source: 'html6-lsp',
-    });
-}
-
-export { addDiagnostic };
+export { getPositionFromIndex };
