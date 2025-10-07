@@ -11,6 +11,7 @@ import {
     TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { hoverElseSyntax } from './else/hover';
 import { validateElseSyntax } from './else/validator';
 import { validateIfSyntax } from './if/validator';
 import { hoverIfSyntax } from './if/hover';
@@ -123,7 +124,11 @@ function setupDocumentsListeners() {
         void connection.sendDiagnostics({ uri: uri, diagnostics: [] });
     });
 
-    const hoverHandlers = [hoverIfSyntax(documents), hoverMapSyntax(documents)];
+    const hoverHandlers = [
+        hoverIfSyntax(documents),
+        hoverMapSyntax(documents),
+        hoverElseSyntax(documents),
+    ];
 
     connection.onHover((params) => {
         for (const handler of hoverHandlers) {
