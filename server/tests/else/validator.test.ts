@@ -84,5 +84,17 @@ describe('Else Validator', () => {
                 'else must follow an element with "if" or "elsif".'
             );
         });
+
+        it('should detect template tag without is attr', () => {
+            const text = `
+                <template i="header">
+				</template>
+            `;
+            const diagnostics = validateElseSyntax(text);
+            expect(diagnostics).toHaveLength(1);
+            expect(diagnostics[0].message).toContain(
+                'template tag must have an "is" attribute indicating its name.'
+            );
+        });
     });
 });

@@ -13,6 +13,20 @@ function validateElseSyntax(text: string): Diagnostic[] {
                 const elsifAttr = node.attributes.find((a) => a.key === 'elsif');
 
                 if (node.tagName === 'template' && node.children?.length) {
+                    if (!node.attributes.some((a) => a.key === 'is')) {
+                        const searchString = 'template';
+                        const attrIndex = text.indexOf(searchString);
+                        const startPos = getPositionFromIndex(text, attrIndex);
+                        const endPos = getPositionFromIndex(text, attrIndex + searchString.length);
+
+                        diagnostics.push({
+                            severity: DiagnosticSeverity.Warning,
+                            range: { start: startPos, end: endPos },
+                            message: `template tag must have an "is" attribute indicating its name.`,
+                            source: 'html6-lsp',
+                        });
+                    }
+
                     node.children.forEach((child) => {
                         if (child.type === 'text' && child?.content?.trim()) {
                             const innerAst = parse(child.content);
