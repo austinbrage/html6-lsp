@@ -11,12 +11,8 @@ import {
     TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { hoverElseSyntax } from './else/hover';
-import { validateElseSyntax } from './else/validator';
-import { validateIfSyntax } from './if/validator';
-import { hoverIfSyntax } from './if/hover';
-import { validateMapSyntax } from './map/validator';
-import { hoverMapSyntax } from './map/hover';
+import { hoverProvider } from './hover/hovers';
+import { validateTemplate } from './diagnostics/diags';
 
 // サーバー接続オブジェクトを作成する。この接続にはNodeのIPC(プロセス間通信)を利用する
 // LSPの全機能を提供する
@@ -83,14 +79,9 @@ function validate(doc: TextDocument) {
 
     const text = doc.getText();
 
-    const if_diagnostics = validateIfSyntax(text);
-    const map_diagnostics = validateMapSyntax(text);
-    const else_diagnostics = validateElseSyntax(text);
-
-    // Send the diagnostics to the client (VS Code)
     void connection.sendDiagnostics({
         uri: doc.uri,
-        diagnostics: [...if_diagnostics, ...map_diagnostics, ...else_diagnostics],
+        diagnostics: validateTemplate(text),
     });
 }
 
@@ -124,21 +115,7 @@ function setupDocumentsListeners() {
         void connection.sendDiagnostics({ uri: uri, diagnostics: [] });
     });
 
-    const hoverHandlers = [
-        hoverIfSyntax(documents),
-        hoverMapSyntax(documents),
-        hoverElseSyntax(documents),
-    ];
-
-    connection.onHover((params) => {
-        for (const handler of hoverHandlers) {
-            const result = handler(params);
-            if (result) {
-                return result;
-            }
-        }
-        return null;
-    });
+    connection.onHover(hoverProvider(documents));
 }
 
 // Listen on the connection
