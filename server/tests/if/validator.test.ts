@@ -35,6 +35,20 @@ describe('If Validator', () => {
             expect(diagnostics).toHaveLength(0);
         });
 
+        it('should return error for missing attr value', () => {
+            const text = `<div if></div>`;
+            const diagnostics = validateIfSyntax(text);
+            expect(diagnostics).toHaveLength(1);
+            expect(diagnostics[0].message).toMatch(/if attributes must have a value/);
+        });
+
+        it('should return error for missing attr value', () => {
+            const text = `<div elsif></div>`;
+            const diagnostics = validateIfSyntax(text);
+            expect(diagnostics).toHaveLength(1);
+            expect(diagnostics[0].message).toMatch(/elsif attributes must have a value/);
+        });
+
         it('should return error for missing closing parenthesis', () => {
             const text = `<div if="user.isAdmin("></div>`;
             const diagnostics = validateIfSyntax(text);
@@ -53,7 +67,7 @@ describe('If Validator', () => {
             const text = `<li if=""></li>`;
             const diagnostics = validateIfSyntax(text);
             expect(diagnostics).toHaveLength(1);
-            expect(diagnostics[0].message).toMatch(/If attribute cannot be empty/);
+            expect(diagnostics[0].message).toMatch(/if attributes cannot be empty/);
         });
     });
 });

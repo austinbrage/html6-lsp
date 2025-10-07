@@ -10,11 +10,16 @@ import { getPositionFromIndex } from '../utils/position';
  */
 function validateIfSyntax(text: string): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
-    const ifAttrRegex = /(?<=\s)(if|elsif)="([^"]*)"/g;
+    const ifAttrRegex = /(if|elsif)(?:="([^"]*)")?/g;
 
-    const addDiagnostic = (start: number, end: number, message: string) => {
+    const addDiagnostic = (
+        start: number,
+        end: number,
+        message: string,
+        severity?: DiagnosticSeverity
+    ) => {
         diagnostics.push({
-            severity: DiagnosticSeverity.Error,
+            severity: severity ?? DiagnosticSeverity.Error,
             range: {
                 start: getPositionFromIndex(text, start),
                 end: getPositionFromIndex(text, end),
@@ -27,13 +32,36 @@ function validateIfSyntax(text: string): Diagnostic[] {
     let match;
     while ((match = ifAttrRegex.exec(text)) !== null) {
         const attrName = match[1];
-        const value = match[2].trim();
+        const value = match[2];
+
+        const preText = text.slice(0, match.index);
+        const lastOpen = preText.lastIndexOf('<');
+        const lastClose = preText.lastIndexOf('>');
+
+        if (lastOpen <= lastClose) {
+            continue;
+        }
 
         const startIdx = match.index;
         const endIdx = match.index + match[0].length;
 
+        if (value === undefined) {
+            addDiagnostic(
+                startIdx,
+                endIdx,
+                `${attrName} attributes must have a value`,
+                DiagnosticSeverity.Warning
+            );
+            continue;
+        }
+
         if (value.length === 0) {
-            addDiagnostic(startIdx, endIdx, 'If attribute cannot be empty');
+            addDiagnostic(
+                startIdx,
+                endIdx,
+                `${attrName} attributes cannot be empty`,
+                DiagnosticSeverity.Warning
+            );
             continue;
         }
 
