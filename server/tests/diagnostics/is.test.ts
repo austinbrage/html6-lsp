@@ -9,6 +9,12 @@ describe('Is Validator', () => {
             const diagnostics = walkTemplateAST(text, [validateIsSyntax]);
             expect(diagnostics).toHaveLength(0);
         });
+
+        it('should pass for correct attribute', () => {
+            const text = `<template is="header"><div>hi</div></template>`;
+            const diagnostics = walkTemplateAST(text, [validateIsSyntax]);
+            expect(diagnostics).toHaveLength(0);
+        });
     });
     describe('invalid expressions', () => {
         it('should return error for missing attr key', () => {
