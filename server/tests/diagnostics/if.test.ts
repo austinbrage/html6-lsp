@@ -89,5 +89,24 @@ describe('If Validator', () => {
             expect(startIdx).toBe(startOffset);
             expect(endIdx).toBe(endOffset);
         });
+
+        it('should detect empty if attribute as invalid and highlight entire attribute', () => {
+            const text = `<li if></li>`;
+            const diagnostics = walkTemplateAST(text, [validateIfSyntax]);
+
+            expect(diagnostics).toHaveLength(1);
+
+            const attrString = `if`;
+            const startOffset = text.indexOf(attrString);
+            const endOffset = startOffset + attrString.length;
+
+            const { start, end } = diagnostics[0].range;
+
+            const startIdx = start.line * text.length + start.character;
+            const endIdx = end.line * text.length + end.character;
+
+            expect(startIdx).toBe(startOffset);
+            expect(endIdx).toBe(endOffset);
+        });
     });
 });
