@@ -32,13 +32,32 @@ The \`if\` attribute controls conditional rendering in templates.
 \`\`\`
 `;
 
+const elsifDocs = `
+## Elsif Attribute
+
+The \`elsif\` attribute works like \`if\`, but only executes if the previous \`if\` or \`elsif\` was false.
+
+**Basic Syntax:**
+- \`elsif="condition"\` – render the element if the condition is truthy and previous \`if\` or \`elsif\` was false.
+
+### Examples:
+
+**If / Elsif / Else:**
+\`\`\`html
+<div if="count > 0">
+  Positive
+</div>
+<div elsif="count === 0">
+  Zero
+</div>
+<div else>
+  Negative
+</div>
+\`\`\`
+`;
+
 /**
- * Creates a hover provider for `if` attributes.
- *
- * Returns Markdown documentation (`ifDocs`) when hovering over an `if` attribute.
- *
- * @param documents - The collection of text documents to provide hover info for.
- * @returns A function that handles hover requests and returns a `Hover` or `null`.
+ * Creates a hover provider for `if` and `elsif` attributes.
  */
 function hoverIfSyntax(documents: TextDocuments<TextDocument>) {
     return (params: HoverParams): Hover | null => {
@@ -50,19 +69,20 @@ function hoverIfSyntax(documents: TextDocuments<TextDocument>) {
         const offset = doc.offsetAt(params.position);
         const text = doc.getText();
 
-        // Regex to match only `if="..."` attributes
-        const ifRegex = /if="[^"]*"/g;
+        // match if="..." or elsif="..." with at least one space before attribute
+        const attrRegex = /\s(if|elsif)="[^"]*"/g;
         let match: RegExpExecArray | null;
 
-        while ((match = ifRegex.exec(text)) !== null) {
-            const start = match.index;
-            const end = match.index + match[0].length;
+        while ((match = attrRegex.exec(text)) !== null) {
+            const start = match.index + 1; // skip leading space
+            const end = start + match[0].trim().length;
 
             if (offset >= start && offset <= end) {
+                const attrName = match[1];
                 return {
                     contents: {
                         kind: 'markdown',
-                        value: ifDocs,
+                        value: attrName === 'if' ? ifDocs : elsifDocs,
                     },
                 };
             }
@@ -72,4 +92,4 @@ function hoverIfSyntax(documents: TextDocuments<TextDocument>) {
     };
 }
 
-export { ifDocs, hoverIfSyntax };
+export { ifDocs, elsifDocs, hoverIfSyntax };
