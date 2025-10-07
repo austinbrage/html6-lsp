@@ -39,9 +39,7 @@ function validateElseSyntax(text: string): Diagnostic[] {
 
                     if (!isValidPrev) {
                         const attrName = elseAttr ? 'else' : 'elsif';
-                        const searchString = elseAttr
-                            ? 'else'
-                            : `elsif="${elsifAttr?.value ?? ''}"`;
+                        const searchString = elseAttr ? 'else' : `elsif`;
                         const attrIndex = text.indexOf(searchString);
                         const startPos = getPositionFromIndex(text, attrIndex);
                         const endPos = getPositionFromIndex(text, attrIndex + searchString.length);
