@@ -93,7 +93,19 @@ describe('Else Validator', () => {
             const diagnostics = validateElseSyntax(text);
             expect(diagnostics).toHaveLength(1);
             expect(diagnostics[0].message).toContain(
-                'template tag must have an "is" attribute indicating its name.'
+                'template tag must have a non-empty "is" attribute indicating its name.'
+            );
+        });
+
+        it('should detect template tag with empty is attr', () => {
+            const text = `
+                <template is>
+				</template>
+            `;
+            const diagnostics = validateElseSyntax(text);
+            expect(diagnostics).toHaveLength(1);
+            expect(diagnostics[0].message).toContain(
+                'template tag must have a non-empty "is" attribute indicating its name.'
             );
         });
     });

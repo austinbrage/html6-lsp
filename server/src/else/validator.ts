@@ -13,7 +13,17 @@ function validateElseSyntax(text: string): Diagnostic[] {
                 const elsifAttr = node.attributes.find((a) => a.key === 'elsif');
 
                 if (node.tagName === 'template' && node.children?.length) {
-                    if (!node.attributes.some((a) => a.key === 'is')) {
+                    let hasNoIsAttr = true;
+                    let isAttrIsEmpty = true;
+                    const isAttr = node.attributes.filter((a) => a.key === 'is');
+
+                    if (isAttr.length === 0) {
+                        hasNoIsAttr = false;
+                    } else if (!isAttr[0]?.value) {
+                        isAttrIsEmpty = false;
+                    }
+
+                    if (!hasNoIsAttr || !isAttrIsEmpty) {
                         const searchString = 'template';
                         const attrIndex = text.indexOf(searchString);
                         const startPos = getPositionFromIndex(text, attrIndex);
@@ -22,7 +32,7 @@ function validateElseSyntax(text: string): Diagnostic[] {
                         diagnostics.push({
                             severity: DiagnosticSeverity.Warning,
                             range: { start: startPos, end: endPos },
-                            message: `template tag must have an "is" attribute indicating its name.`,
+                            message: `template tag must have a non-empty "is" attribute indicating its name.`,
                             source: 'html6-lsp',
                         });
                     }
