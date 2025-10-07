@@ -76,5 +76,24 @@ describe('Map Validator', () => {
             expect(diagnostics).toHaveLength(1);
             expect(diagnostics[0].message).toContain('Invalid expression in map item');
         });
+
+        it('should detect invalid expression on map items and highlight entire attribute', () => {
+            const text = `<li map="item of project/.items"></li>`;
+            const diagnostics = walkTemplateAST(text, [validateMapSyntax]);
+
+            expect(diagnostics).toHaveLength(1);
+
+            const attrString = `map="item of project/.items"`;
+            const startOffset = text.indexOf(attrString);
+            const endOffset = startOffset + attrString.length;
+
+            const { start, end } = diagnostics[0].range;
+
+            const startIdx = start.line * text.length + start.character;
+            const endIdx = end.line * text.length + end.character;
+
+            expect(startIdx).toBe(startOffset);
+            expect(endIdx).toBe(endOffset);
+        });
     });
 });

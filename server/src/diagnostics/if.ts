@@ -35,9 +35,10 @@ export function validateIfSyntax(ctx: ValidationContext) {
         }
 
         function pushDiag(message: string, severity: DiagnosticSeverity) {
-            const attrIndex = text.indexOf(attrName);
+            let attrString = value !== undefined ? `${attrName}="${attr.value}"` : attrName;
+            const attrIndex = text.indexOf(attrString);
             const start = getPositionFromIndex(text, attrIndex);
-            const end = getPositionFromIndex(text, attrIndex + attrName.length);
+            const end = getPositionFromIndex(text, attrIndex + attrString.length);
             diagnostics.push({
                 severity,
                 range: { start, end },

@@ -29,8 +29,10 @@ export function validateElsePosition(ctx: ValidationContext) {
         (prevElement as HimalayaNode).attributes?.some((a) => a.key === 'if' || a.key === 'elsif');
 
     if (!isValidPrev) {
-        const attrName = elseAttr ? 'else' : 'elsif';
-        const searchString = attrName;
+        const attr = elseAttr || elsifAttr!;
+        const attrName = attr.key;
+
+        const searchString = attr.value ? `${attrName}="${attr.value}"` : attrName;
         const attrIndex = text.indexOf(searchString);
         const startPos = getPositionFromIndex(text, attrIndex);
         const endPos = getPositionFromIndex(text, attrIndex + searchString.length);

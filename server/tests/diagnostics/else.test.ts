@@ -85,5 +85,24 @@ describe('Else Validator', () => {
                 'else must follow an element with "if" or "elsif".'
             );
         });
+
+        it('should detect elsif not following if or elsif and highlight entire attribute', () => {
+            const text = '<div elsif="true">Invalid</div>';
+            const diagnostics = walkTemplateAST(text, [validateElsePosition]);
+
+            expect(diagnostics).toHaveLength(1);
+
+            const attrString = `elsif="true"`;
+            const startOffset = text.indexOf(attrString);
+            const endOffset = startOffset + attrString.length;
+
+            const { start, end } = diagnostics[0].range;
+
+            const startIdx = start.line * text.length + start.character;
+            const endIdx = end.line * text.length + end.character;
+
+            expect(startIdx).toBe(startOffset);
+            expect(endIdx).toBe(endOffset);
+        });
     });
 });

@@ -22,7 +22,7 @@ export function validateMapSyntax(ctx: ValidationContext) {
         const parts = value.split(/\s+of\s+/);
         if (parts.length !== 2) {
             pushDiag(
-                `Invalid map syntax: "${value}". Expected "item of items" or "item, i of items".`,
+                `Invalid map syntax: "${value}".\n\nExpected "item of items" or "item, i of items".`,
                 DiagnosticSeverity.Error
             );
             continue;
@@ -31,7 +31,7 @@ export function validateMapSyntax(ctx: ValidationContext) {
         const [left, right] = parts;
         if (!/^\w+(,\s*\w+)?$/.test(left)) {
             pushDiag(
-                `Invalid map variable part: "${left}". Must be "item" or "item, i".`,
+                `Invalid map variable part: "${left}".\n\nMust be "item" or "item, i".`,
                 DiagnosticSeverity.Error
             );
             continue;
@@ -41,15 +41,16 @@ export function validateMapSyntax(ctx: ValidationContext) {
             new Function(`return (${right});`);
         } catch {
             pushDiag(
-                `Invalid expression in map items: "${right}". Must be a valid JavaScript expression.`,
+                `Invalid expression in map items: "${right}".\n\nMust be a valid JavaScript expression.`,
                 DiagnosticSeverity.Error
             );
         }
 
         function pushDiag(message: string, severity: DiagnosticSeverity) {
-            const attrIndex = text.indexOf(attrName);
+            let attrString = value !== undefined ? `${attrName}="${attr.value}"` : attrName;
+            const attrIndex = text.indexOf(attrString);
             const start = getPositionFromIndex(text, attrIndex);
-            const end = getPositionFromIndex(text, attrIndex + attrName.length);
+            const end = getPositionFromIndex(text, attrIndex + attrString.length);
             diagnostics.push({ severity, range: { start, end }, message, source: 'html6-lsp' });
         }
     }
