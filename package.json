@@ -3,8 +3,12 @@
     "displayName": "HMLT6",
     "description": "Language server for HTML6 ensuring proper syntax",
     "version": "0.0.1",
-    "publisher": "yourName",
-    "author": "yourName",
+    "publisher": "austinbrage",
+    "author": "Agustin Brage",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/austinbrage/html6-lsp.git"
+    },
     "engines": {
         "vscode": "^1.69.1"
     },
