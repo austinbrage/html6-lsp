@@ -13,6 +13,10 @@ import {
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { hoverProvider } from './hover/hovers';
 import { validateTemplate } from './diagnostics/diags';
+import { fileURLToPath } from 'url';
+import { completionHandlers } from './completion/completion';
+
+let workspaceRoot: string;
 
 // サーバー接続オブジェクトを作成する。この接続にはNodeのIPC(プロセス間通信)を利用する
 // LSPの全機能を提供する
@@ -22,7 +26,13 @@ connection.console.info(`Sample server running in node ${process.version}`);
 let documents!: TextDocuments<TextDocument>;
 
 // 接続の初期化
-connection.onInitialize((_params, _cancel, progress) => {
+connection.onInitialize((params, _cancel, progress) => {
+    const paramWorkspaceFolders = params.workspaceFolders;
+    const workspaceRootUri = paramWorkspaceFolders ? paramWorkspaceFolders[0].uri : null;
+
+    workspaceRoot = workspaceRootUri ? fileURLToPath(workspaceRootUri) : process.cwd();
+    // console.log('workspaceRoot', workspaceRoot);
+
     // サーバーの起動を進捗表示する
     progress.begin('Initializing Sample Server');
     // テキストドキュメントを監視する
@@ -44,6 +54,10 @@ connection.onInitialize((_params, _cancel, progress) => {
                 },
             },
             hoverProvider: true,
+            completionProvider: {
+                resolveProvider: false, // disable resolving additional completion details
+                triggerCharacters: ['<'], // trigger completion when typing '<'
+            },
         },
     } as InitializeResult;
 });
@@ -116,6 +130,8 @@ function setupDocumentsListeners() {
     });
 
     connection.onHover(hoverProvider(documents));
+
+    completionHandlers(connection, workspaceRoot);
 }
 
 // Listen on the connection
