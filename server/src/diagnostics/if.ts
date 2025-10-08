@@ -19,11 +19,6 @@ export function validateIfSyntax(ctx: ValidationContext) {
             continue;
         }
 
-        if (!value) {
-            pushDiag(`${attrName} attributes must have a value`, DiagnosticSeverity.Warning);
-            continue;
-        }
-
         // Validate JS expression
         try {
             new Function(`return (${value});`);
