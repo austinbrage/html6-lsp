@@ -3,6 +3,7 @@
     "displayName": "HMLT6",
     "description": "Language server for HTML6 ensuring proper syntax",
     "version": "0.0.1",
+    "license": "ISC",
     "publisher": "austinbrage",
     "author": "Agustin Brage",
     "repository": {
