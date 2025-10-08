@@ -1,5 +1,11 @@
 declare module 'himalaya' {
-    export function parse(html: string): HimalayaNode[];
+    export interface ParseOptions {
+        includePositions?: boolean;
+    }
+
+    export const parseDefaults: ParseOptions;
+
+    export function parse(html: string, options?: ParseOptions): HimalayaNode[];
 }
 
 interface HimalayaAttribute {
@@ -13,4 +19,8 @@ interface HimalayaNode {
     content?: string;
     attributes?: HimalayaAttribute[];
     children?: HimalayaNode[];
+    position?: {
+        start: { index: number; line: number; column: number };
+        end: { index: number; line: number; column: number };
+    };
 }
